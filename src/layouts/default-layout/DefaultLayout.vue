@@ -26,8 +26,9 @@
     <!--end::Page-->
   </div>
   <!--end::App-->
-
+  <!-- 右侧抽屉 -->
   <KTDrawers />
+  <!-- 返回顶部 -->
   <KTScrollTop />
   <KTModals />
   <KTCustomize />

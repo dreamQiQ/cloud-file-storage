@@ -4,9 +4,10 @@ import { Tooltip } from "bootstrap";
 import App from "./App.vue";
 
 /*
-TIP: To get started with clean router change path to @/router/clean.ts.
+TIP: To get started with clean router change path to @/router/clean.
+TIP: To get started with router change path to ./router.
  */
-import router from "./router";
+import router from "@/router/clean.ts";
 import ElementPlus from "element-plus";
 import i18n from "@/core/plugins/i18n";
 

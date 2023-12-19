@@ -5,14 +5,15 @@
     id="kt_app_sidebar_footer"
   >
     <a
-      href="https://preview.keenthemes.com/metronic8/vue/docs/index"
+      href="https://hc.mayday5.me/"
       class="btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100"
       data-bs-toggle="tooltip"
       data-bs-trigger="hover"
       data-bs-dismiss-="click"
-      title="200+ in-house components and 3rd-party plugins"
+      title="智能运维平台"
+      target="_blank"
     >
-      <span class="btn-label">Docs &amp; Components</span>
+      <span class="btn-label">DCS</span>
       <KTIcon icon-name="document" icon-class="btn-icon fs-2 m-0" />
     </a>
   </div>
