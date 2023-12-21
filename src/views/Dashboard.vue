@@ -8,7 +8,7 @@ import { defineComponent } from "vue";
 import FilesList from "@/components/files/files.vue";
 
 export default defineComponent({
-  name: "main-dashboard",
+  name: "dashboard",
   components: {
     FilesList,
   },
