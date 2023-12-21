@@ -69,7 +69,7 @@
         <!--end::Title-->
 
         <!--begin::Text-->
-        <div class="d-none d-lg-block text-white fs-base text-center">
+        <!-- <div class="d-none d-lg-block text-white fs-base text-center">
           In this kind of post,
           <a href="#" class="opacity-75-hover text-warning fw-bold me-1"
             >the blogger</a
@@ -83,7 +83,7 @@
           >
           and their <br />
           work following this is a transcript of the interview.
-        </div>
+        </div> -->
         <!--end::Text-->
       </div>
       <!--end::Content-->

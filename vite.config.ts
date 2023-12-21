@@ -12,8 +12,20 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  base: "/metronic8/vue/demo1/",
   build: {
     chunkSizeWarningLimit: 3000,
+  },
+  server: {
+    host: true, //ip地址 或 '0.0.0.0' 或 "loaclhost"
+    port: 80, //端口号
+    open: false, //启动后是否自动打开浏览器
+    https: false, // 是否开启 https
+    proxy: { // 代理
+      '/api': {
+        target: 'http://123.6.102.120:4006',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 });

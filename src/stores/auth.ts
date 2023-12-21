@@ -35,13 +35,25 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function login(credentials: User) {
-    return ApiService.post("login", credentials)
-      .then(({ data }) => {
-        setAuth(data);
-      })
-      .catch(({ response }) => {
-        setError(response.data.errors);
+    const { email, password } = credentials
+    if (email === "admin@qq.com" && password === "admin1234") {
+      setAuth({
+        name: 'admin',
+        surname: '',
+        email: 'admin@qq.com',
+        password: 'admin1234',
+        api_token: 'asdf454a4654asdf654a65sd4f1a65sd4f6'
       });
+    } else {
+      setError(['暂无权限']);
+    }
+    // return ApiService.post("login", credentials)
+    //   .then(({ data }) => {
+    //     setAuth(data);
+    //   })
+    //   .catch(({ response }) => {
+    //     setError(response.data.errors);
+    //   });
   }
 
   function logout() {

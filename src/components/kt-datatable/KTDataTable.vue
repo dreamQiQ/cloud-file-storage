@@ -17,11 +17,12 @@
       </template>
     </TableContent>
     <TableFooter
-      @page-change="pageChange"
       :current-page="currentPage"
       v-model:itemsPerPage="itemsInTable"
       :count="totalItems"
       :items-per-page-dropdown-enabled="itemsPerPageDropdownEnabled"
+      @page-change="pageChange"
+      @update:itemsPerPage="itemsPerPageChange"
     />
   </div>
 </template>
@@ -53,7 +54,7 @@ export default defineComponent({
       required: false,
       default: "asc",
     },
-    emptyTableText: { type: String, required: false, default: "No data found" },
+    emptyTableText: { type: String, required: false, default: "暂无数据" },
     currentPage: { type: Number, required: false, default: 1 },
   },
   emits: [
@@ -61,6 +62,7 @@ export default defineComponent({
     "on-sort",
     "on-items-select",
     "on-items-per-page-change",
+    "update:itemsPerPage",
   ],
   components: {
     TableContent,
@@ -81,6 +83,10 @@ export default defineComponent({
     const pageChange = (page: number) => {
       currentPage.value = page;
       emit("page-change", page);
+    };
+    const itemsPerPageChange = (value: number) => {
+      itemsInTable.value = value;
+      emit("update:itemsPerPage", value);
     };
 
     const dataToDisplay = computed(() => {
@@ -122,6 +128,7 @@ export default defineComponent({
       onItemSelect,
       itemsInTable,
       totalItems,
+      itemsPerPageChange,
     };
   },
 });

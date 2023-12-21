@@ -27,11 +27,12 @@
   </div>
   <!--end::App-->
   <!-- 右侧抽屉 -->
-  <KTDrawers />
+  <!-- <KTDrawers /> -->
   <!-- 返回顶部 -->
   <KTScrollTop />
   <KTModals />
-  <KTCustomize />
+  <!-- 自定义样式 -->
+  <!-- <KTCustomize /> -->
 </template>
 
 <script lang="ts">

@@ -12,7 +12,7 @@
     >
       <KTPageTitle />
       <!--begin::Actions-->
-      <div class="d-flex align-items-center gap-2 gap-lg-3">
+      <div class="d-flex align-items-center gap-2 gap-lg-3" v-if="false">
         <!--begin::Secondary button-->
         <a
           href="#"

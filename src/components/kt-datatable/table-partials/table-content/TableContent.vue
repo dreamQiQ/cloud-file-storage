@@ -2,7 +2,7 @@
   <div class="table-responsive">
     <table
       :class="[loading && 'overlay overlay-block']"
-      class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer"
+      class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer table-hover"
     >
       <TableHeadRow
         @onSort="onSort"
@@ -103,7 +103,7 @@ export default defineComponent({
     const itemsSelect = (value: any) => {
       selectedItems.value = [];
       //eslint-disable-next-line
-      value.forEach((item:any) => {
+      value.forEach((item: any) => {
         if (!selectedItems.value.includes(item)) selectedItems.value.push(item);
       });
     };

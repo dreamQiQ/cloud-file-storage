@@ -17,11 +17,11 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "/dashboard",
-        name: "dashboard",
+        name: "文件管理",
         component: () => import("@/views/Dashboard.vue"),
         meta: {
-          pageTitle: "Dashboard",
-          breadcrumbs: ["Dashboards"],
+          pageTitle: "文件管理",
+          breadcrumbs: ["文件管理"],
         },
       },
     ],
@@ -120,7 +120,7 @@ router.beforeEach((to, from, next) => {
   configStore.resetLayoutConfig();
 
   // verify auth token before each page change
-  authStore.verifyAuth();
+  // authStore.verifyAuth();
 
   // before page access check if page requires authentication
   if (to.meta.middleware == "auth") {

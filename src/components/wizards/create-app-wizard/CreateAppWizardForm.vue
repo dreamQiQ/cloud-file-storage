@@ -159,8 +159,6 @@ const previousStep = () => {
 };
 
 const handleStep = handleSubmit((values) => {
-  console.log(values);
-
   formData.value = {
     ...formData.value,
     ...values,
