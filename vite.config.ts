@@ -17,7 +17,7 @@ export default defineConfig({
   },
   server: {
     host: true, //ip地址 或 '0.0.0.0' 或 "loaclhost"
-    port: 4009, //端口号
+    port: 80, //端口号
     open: false, //启动后是否自动打开浏览器
     https: false, // 是否开启 https
     proxy: { // 代理
