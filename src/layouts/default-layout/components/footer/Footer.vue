@@ -11,12 +11,12 @@
     >
       <!--begin::Copyright-->
       <div class="text-gray-900 order-2 order-md-1">
-        <span class="text-muted fw-semibold me-1">2022©</span>
+        <span class="text-muted fw-semibold me-1">2023©</span>
         <a
           href="https://keenthemes.com"
           target="_blank"
           class="text-gray-800 text-hover-primary"
-          >Keenthemes</a
+          >CloudFileStorage-{{ nodeEnv }}</a
         >
       </div>
       <!--end::Copyright-->
@@ -56,15 +56,20 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { footerDisplay, footerWidthFluid } from "@/layouts/default-layout/config/helper";
+import {
+  footerDisplay,
+  footerWidthFluid,
+} from "@/layouts/default-layout/config/helper";
 
 export default defineComponent({
   name: "theme-footer",
   components: {},
   setup() {
+    const nodeEnv = import.meta.env.VITE_NODE_ENV;
     return {
       footerWidthFluid,
       footerDisplay,
+      nodeEnv,
     };
   },
 });

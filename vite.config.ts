@@ -3,10 +3,10 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 
-type stringKey = Record<string, boolean>
 export default (param: any) => {
   const env = loadEnv(param.mode, process.cwd());   // 获取.env文件里定义的环境变量
-  
+  console.log(111, env.VITE_APP_API_URL, env.VITE_NODE_ENV, param.mode);
+
   return defineConfig({
     plugins: [vue()],
     resolve: {
