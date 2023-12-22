@@ -63,5 +63,5 @@ tar -czf dist.tar.gz ./index.html ./assets ./media ./splash-screen.css
 
 echo "########## docker build #########"
 cd ../
-docker build -t $DOCKER_NAME-f-storage:latest -f ./sandboxdeploy/gomk-f-storage-dockerfile ./dist
+docker build -t $DOCKER_NAME-f-files:latest -f ./sandboxdeploy/gomk-f-files-dockerfile ./dist
 echo "########## docker build image end #########"
