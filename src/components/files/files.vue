@@ -62,6 +62,9 @@
           <template v-slot:fileName="{ row: data }">
             {{ data.fileName }}
           </template>
+          <template v-slot:createdAt="{ row: data }">
+            {{ data.createdAt }}
+          </template>
           <template v-slot:fileSize="{ row: data }">
             {{ data.fileSize }}
           </template>
@@ -128,6 +131,10 @@ export default defineComponent({
         {
           columnName: "文件名",
           columnLabel: "fileName",
+        },
+        {
+          columnName: "上传时间",
+          columnLabel: "createdAt",
         },
         {
           columnName: "文件大小",

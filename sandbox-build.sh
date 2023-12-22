@@ -59,7 +59,7 @@ npm run build
 echo "########## tar dists #########"
 cd ./dist
 # ./favicon.ico
-tar -czf dist.tar.gz ./index.html ./assets ./media ./splash-screen.css
+tar -czf dist.tar.gz ./index.html ./assets ./media ./splash-screen.css ./favicon.ico
 
 echo "########## docker build #########"
 cd ../

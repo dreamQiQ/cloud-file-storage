@@ -22,7 +22,7 @@ export default defineConfig({
     https: false, // 是否开启 https
     proxy: { // 代理
       '/api': {
-        target: 'http://172.17.0.1:4006',
+        target: 'http://123.6.102.120:4006',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
