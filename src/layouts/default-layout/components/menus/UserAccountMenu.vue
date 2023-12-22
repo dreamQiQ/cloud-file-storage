@@ -16,13 +16,13 @@
         <!--begin::Username-->
         <div class="d-flex flex-column">
           <div class="fw-bold d-flex align-items-center fs-5">
-            Max Smith
+            admin
             <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
               >Pro</span
             >
           </div>
           <a href="#" class="fw-semibold text-muted text-hover-primary fs-7"
-            >max@kt.com</a
+            >admin@qq.com</a
           >
         </div>
         <!--end::Username-->
@@ -35,15 +35,15 @@
     <!--end::Menu separator-->
 
     <!--begin::Menu item-->
-    <div class="menu-item px-5">
+    <!-- <div class="menu-item px-5">
       <router-link to="/pages/profile/overview" class="menu-link px-5">
         My Profile
       </router-link>
-    </div>
+    </div> -->
     <!--end::Menu item-->
 
     <!--begin::Menu item-->
-    <div class="menu-item px-5">
+    <!-- <div class="menu-item px-5">
       <router-link to="/pages/profile/overview" class="menu-link px-5">
         <span class="menu-text">My Projects</span>
         <span class="menu-badge">
@@ -52,11 +52,12 @@
           >
         </span>
       </router-link>
-    </div>
+    </div> -->
     <!--end::Menu item-->
 
     <!--begin::Menu item-->
     <div
+      v-if="false"
       class="menu-item px-5"
       data-kt-menu-trigger="hover"
       data-kt-menu-placement="left-start"
@@ -140,11 +141,11 @@
     <!--end::Menu item-->
 
     <!--begin::Menu item-->
-    <div class="menu-item px-5">
+    <!-- <div class="menu-item px-5">
       <router-link to="/pages/profile/overview" class="menu-link px-5">
         My Statements
       </router-link>
-    </div>
+    </div> -->
     <!--end::Menu item-->
 
     <!--begin::Menu separator-->
@@ -153,6 +154,7 @@
 
     <!--begin::Menu item-->
     <div
+      v-if="false"
       class="menu-item px-5"
       data-kt-menu-trigger="hover"
       data-kt-menu-placement="left-start"
@@ -281,11 +283,11 @@
     <!--end::Menu item-->
 
     <!--begin::Menu item-->
-    <div class="menu-item px-5 my-1">
+    <!-- <div class="menu-item px-5 my-1">
       <router-link to="/pages/profile/overview" class="menu-link px-5">
         Account Settings
       </router-link>
-    </div>
+    </div> -->
     <!--end::Menu item-->
 
     <!--begin::Menu item-->
