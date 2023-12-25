@@ -263,6 +263,7 @@ export default defineComponent({
             state.deleteLoading = false;
             resetList();
           } catch (err: any) {
+            state.deleteLoading = false;
             ElMessage.error(`删除失败，${err}`);
           }
         } else {
