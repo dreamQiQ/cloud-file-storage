@@ -78,6 +78,16 @@
             <el-button class="btn btn-sm btn-primary" @click="fileDownload(row)"
               >下载</el-button
             >
+            <el-button
+              class="btn btn-sm btn-secondary"
+              @click="fileDelete(row)"
+            >
+              <span>删除</span>
+              <span
+                v-show="deleteLoading"
+                class="spinner-border spinner-border-sm ms-2"
+              ></span>
+            </el-button>
           </template>
         </Datatable>
       </div>
@@ -90,6 +100,7 @@ import { defineComponent, onMounted, toRefs, reactive } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import ApiService from "@/core/services/ApiService";
 import { ElMessage } from "element-plus";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 export default defineComponent({
   name: "kt-datatables",
@@ -106,6 +117,7 @@ export default defineComponent({
       pageNum: number;
       fileName: string;
       fileSourceMap: object;
+      deleteLoading: boolean;
     };
     const state: typeState = reactive({
       tableHeader: [],
@@ -118,6 +130,7 @@ export default defineComponent({
       fileSourceMap: {
         COM_VX: "企业微信",
       },
+      deleteLoading: false,
     });
 
     onMounted(() => {
@@ -161,7 +174,7 @@ export default defineComponent({
         const { pageSize, pageNum, fileName } = state;
         state.loading = true;
         state.tableData = [];
-        let url = `/gomk/archived-file/cloud-files/query-page?pageSize=${pageSize}&pageNum=${pageNum}`;
+        let url = `/cloud-files/query-page?pageSize=${pageSize}&pageNum=${pageNum}`;
         if (fileName) url = url + `&fileName=${fileName}`;
         const { data } = await ApiService.get(url);
         state.tableData = data.list;
@@ -226,6 +239,37 @@ export default defineComponent({
         ElMessage.error(`下载失败，${error}`);
       }
     };
+    // 文件删除
+    const fileDelete = async (row: any) => {
+      Swal.fire({
+        text: "确定要删除该文件吗？",
+        icon: "warning",
+        buttonsStyling: false,
+        showCancelButton: true,
+        confirmButtonText: "确 定",
+        cancelButtonText: "取 消",
+        heightAuto: false,
+        customClass: {
+          confirmButton: "btn  btn-danger",
+          cancelButton: "btn btn-active-light-primary",
+        },
+      }).then(async ({ value }) => {
+        if (value) {
+          try {
+            if (state.deleteLoading) return false;
+            state.deleteLoading = true;
+            await ApiService.delete(`/cloud-files/${row.id}`);
+            ElMessage.success("删除成功");
+            state.deleteLoading = false;
+            resetList();
+          } catch (err: any) {
+            ElMessage.error(`删除失败，${err}`);
+          }
+        } else {
+          ElMessage.info(`已取消`);
+        }
+      });
+    };
 
     return {
       ...toRefs(state),
@@ -234,6 +278,7 @@ export default defineComponent({
       searchFiles,
       uploadComplexChange,
       fileDownload,
+      fileDelete,
     };
   },
 });

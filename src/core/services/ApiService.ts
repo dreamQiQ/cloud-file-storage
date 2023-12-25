@@ -21,12 +21,13 @@ class ApiService {
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
     // baseURL
-    // ApiService.vueInstance.axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+    // ApiService.vueInstance.axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL;
     ApiService.vueInstance.axios.defaults.baseURL = '/api';
     // 数据类型
     ApiService.vueInstance.axios.defaults.headers.common["Accept"] = "application/json";
     // 请求配置
     ApiService.vueInstance.axios.interceptors.request.use((config: any) => {
+      config.url = '/gomk/archived-file' + config.url
       return config
     }, error => {
       ElMessage.error(error)
@@ -37,7 +38,7 @@ class ApiService {
       const { data, config } = response;
       switch (data.code) {
         case 403:
-          ElMessage.error(data.message || '权限不足')
+          ElMessage.error(data.message || data.msg || '权限不足')
           break
         case 500:
           ElMessage.error(data.message || data.msg || '后台服务错误')
