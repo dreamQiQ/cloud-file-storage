@@ -21,8 +21,11 @@ class ApiService {
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
     // baseURL
-    // ApiService.vueInstance.axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-    ApiService.vueInstance.axios.defaults.baseURL = '/api';
+    if (import.meta.env.VITE_NODE_ENV === 'development') {
+      ApiService.vueInstance.axios.defaults.baseURL = '/api';
+    } else {
+      ApiService.vueInstance.axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL;
+    }
     // 数据类型
     ApiService.vueInstance.axios.defaults.headers.common["Accept"] = "application/json";
     // 请求配置
