@@ -211,7 +211,7 @@ export default defineComponent({
         const formData = new FormData();
         formData.append("file", file.raw);
         await ApiService.post(
-          "/gomk/archived-file/cloud-files/upload-file",
+          "/cloud-files/upload-file",
           formData
         );
         ElMessage.success("上传成功");
@@ -230,7 +230,7 @@ export default defineComponent({
     const fileDownload = async (row: any) => {
       try {
         await ApiService.download(
-          `/gomk/archived-file/cloud-files/download-file?id=${row.id}`,
+          `/cloud-files/download-file?id=${row.id}`,
           "get",
           row.fileName
         );
@@ -250,7 +250,7 @@ export default defineComponent({
         cancelButtonText: "取 消",
         heightAuto: false,
         customClass: {
-          confirmButton: "btn  btn-danger",
+          confirmButton: "btn btn-danger",
           cancelButton: "btn btn-active-light-primary",
         },
       }).then(async ({ value }) => {
