@@ -3,7 +3,7 @@ import type { AxiosResponse } from "axios";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import JwtService from "@/core/services/JwtService";
-import { ElMessage } from "element-plus";
+import { toastr } from "@/core/plugins/toastr";
 
 /**
  * @description service to call HTTP request via Axios
@@ -27,10 +27,10 @@ class ApiService {
     ApiService.vueInstance.axios.defaults.headers.common["Accept"] = "application/json";
     // 请求配置
     ApiService.vueInstance.axios.interceptors.request.use((config: any) => {
-      config.url = '/gomk/archived-file' + config.url
+      config.url = import.meta.env.VITE_APP_BASE_URL + config.url
       return config
     }, error => {
-      ElMessage.error(error)
+      toastr.error(error)
       return Promise.reject(error)
     })
     // 响应配置
@@ -38,16 +38,16 @@ class ApiService {
       const { data, config } = response;
       switch (data.code) {
         case 403:
-          ElMessage.error(data.message || data.msg || '权限不足')
+          toastr.error(data.message || data.msg || '权限不足')
           break
         case 500:
-          ElMessage.error(data.message || data.msg || '后台服务错误')
+          toastr.error(data.message || data.msg || '后台服务错误')
           break
         case 1001:
-          ElMessage.error(data.message || data.msg || '后台服务错误')
+          toastr.error(data.message || data.msg || '后台服务错误')
           break
         case 1000:
-          ElMessage.error(data.message || data.msg || '后台服务错误')
+          toastr.error(data.message || data.msg || '后台服务错误')
           break
         default:
           return data
@@ -67,7 +67,7 @@ class ApiService {
       }
       const status = err.response.status
       const message = err.response?.data?.message || err.response?.data?.msg || STATUS_MESSAGE[status]
-      // ElMessage.error(`${status}-${message}`)
+      // toastr.error(`${status}-${message}`)
       return Promise.reject(message)
     })
   }
@@ -136,7 +136,24 @@ class ApiService {
    * @returns Promise<AxiosResponse>
    */
   public static put(resource: string, params: any): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.put(`${resource}`, params);
+    return ApiService.vueInstance.axios({
+      method: 'put',
+      url: `${resource}`,
+      data: params,
+      transformRequest: [
+        function (data) {
+          let ret = ''
+          for (let it in data) {
+            ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+          }
+          ret = ret.substring(0, ret.length - 1)
+          return ret
+        },
+      ],
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
   }
 
   /**
@@ -144,8 +161,12 @@ class ApiService {
    * @param resource: string
    * @returns Promise<AxiosResponse>
    */
-  public static delete(resource: string): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.delete(resource);
+  public static delete(resource: string, params?: any): Promise<AxiosResponse> {
+    return ApiService.vueInstance.axios({
+      method: 'delete',
+      url: `${resource}`,
+      params: params,
+    })
   }
 
   public static download(url, method: string, filename?: string, params?: object) {

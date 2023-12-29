@@ -14,21 +14,23 @@
         :header="header"
       />
       <TableBodyRow
-        v-if="data.length !== 0"
-        @onSelect="itemsSelect"
         :currentlySelectedItems="selectedItems"
         :data="data"
         :header="header"
         :checkbox-enabled="checkboxEnabled"
         :checkbox-label="checkboxLabel"
+        :check-new-item="checkNewItem"
+        @onSelect="itemsSelect"
+        @cancelNewItem="cancelNewItem"
+        @submitNewItem="submitNewItem"
       >
         <template v-for="(_, name) in $slots" v-slot:[name]="{ row: item }">
           <slot :name="name" :row="item" />
         </template>
       </TableBodyRow>
-      <template v-else>
+      <template v-if="!data.length">
         <tr class="odd">
-          <td colspan="7" class="dataTables_empty">
+          <td colspan="7" class="dataTables_empty" style="text-align: center">
             {{ emptyTableText }}
           </td>
         </tr>
@@ -59,9 +61,10 @@ export default defineComponent({
     },
     checkboxEnabled: { type: Boolean, required: false, default: false },
     checkboxLabel: { type: String, required: false, default: "id" },
+    checkNewItem: { type: Boolean, required: false, default: false },
     loading: { type: Boolean, required: false, default: false },
   },
-  emits: ["on-sort", "on-items-select"],
+  emits: ["on-sort", "on-items-select", "submit-new-item", "cancel-new-item"],
   components: {
     TableHeadRow,
     TableBodyRow,
@@ -133,12 +136,23 @@ export default defineComponent({
       });
     });
 
+    // 新增文件夹
+    const submitNewItem = (folderName) => {
+      emit("submit-new-item", folderName);
+    };
+    // 取消新增
+    const cancelNewItem = () => {
+      emit("cancel-new-item");
+    };
+
     return {
       onSort,
       selectedItems,
       selectAll,
       itemsSelect,
       check,
+      submitNewItem,
+      cancelNewItem,
     };
   },
 });

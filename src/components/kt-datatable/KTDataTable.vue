@@ -6,11 +6,14 @@
       :header="header"
       :data="dataToDisplay"
       :checkboxEnabled="checkboxEnabled"
+      :checkNewItem="checkNewItem"
       :checkboxLabel="checkboxLabel"
       :empty-table-text="emptyTableText"
       :sort-label="sortLabel"
       :sort-order="sortOrder"
       :loading="loading"
+      @cancelNewItem="cancelNewItem"
+      @submitNewItem="submitNewItem"
     >
       <template v-for="(_, name) in $slots" v-slot:[name]="{ row: item }">
         <slot :name="name" :row="item" />
@@ -45,6 +48,7 @@ export default defineComponent({
       default: true,
     },
     checkboxEnabled: { type: Boolean, required: false, default: false },
+    checkNewItem: { type: Boolean, required: false, default: false },
     checkboxLabel: { type: String, required: false, default: "id" },
     total: { type: Number, required: false },
     loading: { type: Boolean, required: false, default: false },
@@ -63,6 +67,8 @@ export default defineComponent({
     "on-items-select",
     "on-items-per-page-change",
     "update:itemsPerPage",
+    "submit-new-item",
+    "cancel-new-item",
   ],
   components: {
     TableContent,
@@ -121,6 +127,16 @@ export default defineComponent({
       emit("on-items-select", selectedItems);
     };
 
+    // 新增文件夹
+    const submitNewItem = (folderName) => {
+      emit("submit-new-item", folderName);
+    };
+
+    // 取消新增
+    const cancelNewItem = () => {
+      emit("cancel-new-item");
+    };
+
     return {
       pageChange,
       dataToDisplay,
@@ -129,6 +145,8 @@ export default defineComponent({
       itemsInTable,
       totalItems,
       itemsPerPageChange,
+      submitNewItem,
+      cancelNewItem,
     };
   },
 });
