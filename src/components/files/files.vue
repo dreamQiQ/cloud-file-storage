@@ -263,7 +263,11 @@
                     >
                       <a class="menu-link px-3">重命名</a>
                     </div>
-                    <div class="menu-item px-3" @click="moveFolder(data)">
+                    <div
+                      v-if="data.type !== 1"
+                      class="menu-item px-3"
+                      @click="moveFolder(data)"
+                    >
                       <a class="menu-link px-3">移至文件夹</a>
                     </div>
                     <div class="menu-item px-3" @click="fileDelete(data)">
