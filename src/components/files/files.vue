@@ -770,6 +770,12 @@ export default defineComponent({
       try {
         const { name, path } = state.moveFolderVal;
 
+        console.log("11111111111", name, path, state.radioVal);
+        if (!state.radioVal) {
+          toastr.warning(`请选择文件夹`);
+          return false;
+        }
+
         if (state.total === 1) {
           Swal.fire({
             text: "文件移出后该文件夹将被删除，请确认！",
@@ -790,8 +796,13 @@ export default defineComponent({
                 fileName: name,
                 targetDir: state.radioVal,
               });
+              toastr.success(`移动成功`);
+              cancelFileFolder();
+              resetList();
             } else {
               toastr.warning(`已取消`);
+              cancelFileFolder();
+              resetList();
             }
           });
         } else {
@@ -800,12 +811,14 @@ export default defineComponent({
             fileName: name,
             targetDir: state.radioVal,
           });
+          toastr.success(`移动成功`);
+          cancelFileFolder();
+          resetList();
         }
-        cancelFileFolder();
-        toastr.success(`移动成功`);
-        resetList();
       } catch (error) {
         toastr.success(`移动失败`);
+        cancelFileFolder();
+        resetList();
       }
     };
 
