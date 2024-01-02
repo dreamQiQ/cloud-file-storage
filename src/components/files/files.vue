@@ -774,7 +774,6 @@ export default defineComponent({
       try {
         const { name, path } = state.moveFolderVal;
 
-        console.log("11111111111", name, path, state.radioVal);
         if (!state.radioVal) {
           toastr.warning(`请选择文件夹`);
           return false;
