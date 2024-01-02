@@ -263,14 +263,9 @@
                     >
                       <a class="menu-link px-3">重命名</a>
                     </div>
-                    <!-- <div
-                      class="menu-item px-3"
-                      data-bs-toggle="modal"
-                      data-bs-target="#modal_move_to_folder"
-                      @click="moveFolder(data)"
-                    >
+                    <div class="menu-item px-3" @click="moveFolder(data)">
                       <a class="menu-link px-3">移至文件夹</a>
-                    </div> -->
+                    </div>
                     <div class="menu-item px-3" @click="fileDelete(data)">
                       <a class="menu-link text-danger px-3">删除</a>
                     </div>
@@ -283,53 +278,38 @@
       </div>
     </div>
   </div>
-
-  <!-- 移动文件夹弹框 -->
-  <!-- id="modal_move_to_folder" -->
+  <!-- 移动文件夹 -->
   <div ref="moveFolderRef" class="modal fade" tabindex="-1" aria-hidden="true">
-    <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-650px">
-      <!--begin::Modal content-->
       <div class="modal-content">
-        <!--begin::Form-->
         <form class="form" action="#">
-          <!--begin::Modal header-->
           <div class="modal-header">
-            <!--begin::Modal title-->
             <h2 class="fw-bold">移至文件夹</h2>
-            <!--end::Modal title-->
-            <!--begin::Close-->
             <div
               class="btn btn-icon btn-sm btn-active-icon-primary"
-              data-bs-dismiss="modal"
+              @click="cancelFileFolder"
             >
               <i class="ki-duotone ki-cross fs-1">
                 <span class="path1"></span>
                 <span class="path2"></span>
               </i>
             </div>
-            <!--end::Close-->
           </div>
-          <!--end::Modal header-->
-          <!--begin::Modal body-->
           <div class="modal-body pt-10 pb-15 px-lg-17">
             <i
               v-show="nextLevelVal !== '/'"
-              class="ki-duotone ki-arrow-left mb-6 cursor-pointer"
+              class="ki-duotone ki-left mb-6 cursor-pointer"
               style="font-size: 24px"
               @click="goBackFolder"
             >
               <span class="path1"></span>
               <span class="path2"></span>
             </i>
-            <!--begin::Input group-->
+
             <div v-if="folderList.length" class="form-group fv-row">
-              <!--begin::Item-->
               <template v-for="item in folderList" :key="item.name">
                 <div class="d-flex">
-                  <!--begin::Checkbox-->
                   <div class="form-check form-check-custom form-check-solid">
-                    <!--begin::Input-->
                     <input
                       v-model="radioVal"
                       class="form-check-input me-3"
@@ -337,8 +317,7 @@
                       type="radio"
                       :value="item.path"
                     />
-                    <!--end::Input-->
-                    <!--begin::Label-->
+
                     <label
                       class="form-check-label"
                       @click="folderNextLevel(item)"
@@ -351,32 +330,25 @@
                         {{ item.name }}
                       </div>
                     </label>
-                    <!--end::Label-->
                   </div>
-                  <!--end::Checkbox-->
                 </div>
-                <!--end::Item-->
                 <div class="separator separator-dashed my-5"></div>
               </template>
             </div>
             <div v-else class="dataTables_empty" style="text-align: center">
               暂无数据
             </div>
-            <!--end::Input group-->
-            <!--begin::Action buttons-->
             <div class="d-flex flex-center mt-12">
               <button
                 type="button"
-                class="btn btn-light"
-                data-bs-dismiss="modal"
+                class="btn btn-light me-6"
+                @click="cancelFileFolder"
               >
-                Close
+                取 消
               </button>
-              <!--begin::Button-->
               <button
                 type="button"
                 class="btn btn-primary"
-                id="kt_modal_move_to_folder_submit"
                 @click="checkFileFolder"
               >
                 <span class="indicator-label">保 存</span>
@@ -387,13 +359,9 @@
                   ></span>
                 </span>
               </button>
-              <!--end::Button-->
             </div>
-            <!--begin::Action buttons-->
           </div>
-          <!--end::Modal body-->
         </form>
-        <!--end::Form-->
       </div>
     </div>
   </div>
@@ -472,7 +440,7 @@ export default defineComponent({
       },
     });
 
-    const moveFolderRef = ref(null);
+    const moveFolderRef = ref();
 
     const fullPath = computed(() => {
       let path = state.dirList.join("/");
@@ -484,6 +452,9 @@ export default defineComponent({
       tableListInit();
       getTableList();
       getFolderList();
+
+      // 实例
+      state.modalInstance = new Modal(moveFolderRef.value);
     });
 
     // 列表初始化
@@ -694,8 +665,13 @@ export default defineComponent({
     const fileRename = (data: any) => {
       const typeIndex = data.name.lastIndexOf(".");
       state.rename = data.name;
-      state.renameVal = data.name.slice(0, typeIndex);
-      state.renameType = data.name.slice(typeIndex);
+      if (typeIndex !== -1) {
+        state.renameVal = data.name.slice(0, typeIndex);
+        state.renameType = data.name.slice(typeIndex);
+      } else {
+        state.renameVal = data.name;
+        state.renameType = "";
+      }
     };
     const submitRename = (data: any) => {
       const { type } = data;
@@ -751,16 +727,11 @@ export default defineComponent({
 
     // 移至文件夹
     const moveFolder = (data) => {
+      if (!state.folderList.length) return false;
       state.nextLevelVal = "/";
-      state.moveFolderVal = data;
-
-      console.log("1111111111", Modal);
-      console.log("222222222", moveFolderRef.value);
-
-      // setTimeout(() => {
-      // state.modalInstance = new Modal(moveFolderRef.value);
-      // });
-      // state.modalInstance.show();
+      state.moveFolderVal.name = data.name;
+      state.moveFolderVal.path = fullPath.value;
+      state.modalInstance.show();
     };
 
     // 文件夹列表
@@ -769,6 +740,10 @@ export default defineComponent({
         const { data } = await ApiService.get(
           `/minio/list-dir?dir=${state.nextLevelVal || "/"}`
         );
+        if (!(data && data.length)) {
+          toastr.warning(`下级文件夹不存在`);
+          return false;
+        }
         state.folderList = data;
       } catch (error) {
         toastr.error(`获取文件夹列表失败`);
@@ -794,25 +769,59 @@ export default defineComponent({
     const checkFileFolder = async () => {
       try {
         const { name, path } = state.moveFolderVal;
-        await ApiService.put("/minio/move-file", {
-          parentDir: path,
-          fileName: name,
-          targetDir: state.radioVal,
-        });
-        state.radioVal = "";
-        state.moveFolderVal = {
-          name: "",
-          path: "",
-        };
-        state.modalInstance.hide();
+
+        if (state.total === 1) {
+          Swal.fire({
+            text: "文件移出后该文件夹将被删除，请确认！",
+            icon: "warning",
+            buttonsStyling: false,
+            showCancelButton: true,
+            confirmButtonText: "确 定",
+            cancelButtonText: "取 消",
+            heightAuto: false,
+            customClass: {
+              confirmButton: "btn btn-danger",
+              cancelButton: "btn btn-active-light-primary",
+            },
+          }).then(async ({ value }) => {
+            if (value) {
+              await ApiService.put("/minio/move-file", {
+                parentDir: path,
+                fileName: name,
+                targetDir: state.radioVal,
+              });
+            } else {
+              toastr.warning(`已取消`);
+            }
+          });
+        } else {
+          await ApiService.put("/minio/move-file", {
+            parentDir: path,
+            fileName: name,
+            targetDir: state.radioVal,
+          });
+        }
+        cancelFileFolder();
         toastr.success(`移动成功`);
+        resetList();
       } catch (error) {
         toastr.success(`移动失败`);
       }
     };
 
+    // 取消修改文件文件夹
+    const cancelFileFolder = () => {
+      state.radioVal = "";
+      state.moveFolderVal = {
+        name: "",
+        path: "",
+      };
+      state.modalInstance.hide();
+    };
+
     return {
       ...toRefs(state),
+      moveFolderRef,
       nextDir,
       resetList,
       pageChange,
@@ -833,6 +842,7 @@ export default defineComponent({
       folderNextLevel,
       goBackFolder,
       checkFileFolder,
+      cancelFileFolder,
     };
   },
 });
