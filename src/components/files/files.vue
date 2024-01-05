@@ -12,7 +12,7 @@
             <input
               v-model="searchValue"
               type="text"
-              class="form-control form-control-solid w-250px ps-15"
+              class="form-control form-control-solid w-500px ps-15"
               placeholder="搜索文件"
               @change="resetList"
             />
@@ -47,20 +47,17 @@
               >新建文件夹
             </button>
             <!-- 上传文件 -->
-            <el-upload
-              ref="excel-upload"
-              action=""
-              :auto-upload="false"
-              :show-file-list="false"
-              :on-change="uploadComplexChange"
+
+            <button
+              type="button"
+              class="btn btn-flex btn-primary"
+              @click="showUploadModal"
             >
-              <button type="button" class="btn btn-flex btn-primary">
-                <i class="ki-duotone ki-folder-up fs-2">
-                  <span class="path1"></span>
-                  <span class="path2"></span> </i
-                >上传文件
-              </button>
-            </el-upload>
+              <i class="ki-duotone ki-folder-up fs-2">
+                <span class="path1"></span>
+                <span class="path2"></span> </i
+              >上传文件
+            </button>
           </div>
         </div>
       </div>
@@ -270,6 +267,13 @@
                     >
                       <a class="menu-link px-3">移至文件夹</a>
                     </div>
+                    <!-- <div
+                      v-if="checkFileType(data, ['pdf', 'doc', 'docx'])"
+                      class="menu-item px-3"
+                      @click="inputGpt(data)"
+                    >
+                      <a class="menu-link px-3">输入GPT</a>
+                    </div> -->
                     <div class="menu-item px-3" @click="fileDelete(data)">
                       <a class="menu-link text-danger px-3">删除</a>
                     </div>
@@ -369,6 +373,62 @@
       </div>
     </div>
   </div>
+  <!-- 文件上传 -->
+  <div ref="uploadFileRef" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="fw-bold">文件上传</h2>
+          <div
+            class="btn btn-icon btn-sm btn-active-icon-primary"
+            @click="uploadFile.hide()"
+          >
+            <i class="ki-duotone ki-cross fs-1">
+              <span class="path1"></span>
+              <span class="path2"></span>
+            </i>
+          </div>
+        </div>
+        <div class="modal-body pt-10 pb-15 px-lg-17">
+          <div v-bind="getRootProps()">
+            <input v-bind="getInputProps()" />
+            <div class="dropzone" id="kt_dropzonejs_example_1">
+              <div class="dz-message needsclick">
+                <i class="ki-duotone ki-file-up fs-3x text-primary">
+                  <span v-show="!uploadLoading">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                  </span>
+                  <span
+                    v-show="uploadLoading"
+                    class="spinner-border spinner-border-sm"
+                    style="width: 2rem; height: 2rem"
+                  ></span>
+                </i>
+                <div class="ms-4">
+                  <h3
+                    v-show="isDragActive"
+                    class="fs-5 fw-bold text-gray-900 mb-1"
+                  >
+                    将文件放在此处....
+                  </h3>
+                  <h3
+                    v-show="!isDragActive"
+                    class="fs-5 fw-bold text-gray-900 mb-1"
+                  >
+                    将文件拖到此处，或点击上传
+                  </h3>
+                  <span class="fs-7 fw-semibold text-gray-500">
+                    最多上传10个文件
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -385,7 +445,7 @@ import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { toastr } from "@/core/plugins/toastr";
 import { Modal } from "bootstrap";
-import makeData from "@/components/files/data.js";
+import { useDropzone } from "vue3-dropzone";
 
 export default defineComponent({
   name: "kt-datatables",
@@ -412,7 +472,11 @@ export default defineComponent({
       radioVal: string;
       folderList: Array<any>;
       nextLevelVal: string;
+      moveFolderRef: any;
       modalInstance: any;
+      uploadFile: any;
+      uploadFileRef: any;
+      uploadLoading: boolean;
       moveFolderVal: {
         name: string;
         path: string;
@@ -437,14 +501,16 @@ export default defineComponent({
       radioVal: "",
       folderList: [],
       nextLevelVal: "/",
+      moveFolderRef: "",
       modalInstance: "",
+      uploadFile: "",
+      uploadFileRef: "",
+      uploadLoading: false,
       moveFolderVal: {
         name: "",
         path: "",
       },
     });
-
-    const moveFolderRef = ref();
 
     const fullPath = computed(() => {
       let path = state.dirList.join("/");
@@ -453,12 +519,14 @@ export default defineComponent({
     });
 
     onMounted(() => {
+      // 弹框实例
+      state.modalInstance = new Modal(state.moveFolderRef);
+      state.uploadFile = new Modal(state.uploadFileRef);
+
       tableListInit();
       getTableList();
       getFolderList();
-
       // 实例
-      state.modalInstance = new Modal(moveFolderRef.value);
     });
 
     // 列表初始化
@@ -504,7 +572,7 @@ export default defineComponent({
         const { data } = await ApiService.get(url);
         state.tableData = data.list;
         state.total = data.total;
-        state.searchValue = "";
+        // state.searchValue = "";
         state.pageSize = data.pageSize;
         state.loading = false;
       } catch (err: any) {
@@ -533,19 +601,44 @@ export default defineComponent({
       getTableList();
     };
 
+    // 上传弹框
+    const showUploadModal = () => {
+      state.uploadFile.show();
+    };
     // 文件上传
-    const uploadComplexChange = async (file) => {
+    const uploadFileDrop = async (acceptFiles, rejectReasons) => {
+      if (rejectReasons?.length) {
+        if (rejectReasons?.length > 10) {
+          toastr.error("最多上传10个文件");
+          return false;
+        }
+        toastr.error("文件上传失败");
+        return false;
+      }
       try {
-        const formData = new FormData();
-        formData.append("file", file.raw);
-        formData.append("sourcePath", fullPath.value);
-        await ApiService.post("/minio/upload-file", formData);
+        state.uploadLoading = true;
+        const requestFiles = acceptFiles.map((f) => {
+          const formData = new FormData();
+          formData.append("file", f);
+          formData.append("sourcePath", fullPath.value);
+          return ApiService.post("/minio/upload-file", formData);
+        });
+
+        await Promise.all(requestFiles);
+        state.uploadLoading = false;
         toastr.success("上传成功");
         resetList();
       } catch (err: any) {
+        state.uploadLoading = false;
         toastr.error(err);
       }
+      console.log("files++", acceptFiles);
     };
+    // 文件上传初始化
+    const { getRootProps, getInputProps, ...dropRest } = useDropzone({
+      maxFiles: 10,
+      onDrop: uploadFileDrop,
+    });
     // 重置
     const resetList = () => {
       state.pageNum = 1;
@@ -835,15 +928,30 @@ export default defineComponent({
       state.modalInstance.hide();
     };
 
+    // 输入GPT
+    const inputGpt = (data: any) => {
+      console.log(data);
+    };
+    // 判断文件类型
+    const checkFileType = (data: any, types: Array<string>) => {
+      const { name, type } = data;
+      if (type === 1) {
+        return true;
+      } else {
+        const typeIndex = name.lastIndexOf(".");
+        const fileType = name.slice(typeIndex + 1);
+        return types.includes(fileType);
+      }
+    };
+
     return {
       ...toRefs(state),
-      moveFolderRef,
       nextDir,
       resetList,
       pageChange,
       jumpPath,
       itemsPerPageChange,
-      uploadComplexChange,
+      showUploadModal,
       showNewFolder,
       returnUpperLevel,
       submitNewItem,
@@ -859,6 +967,11 @@ export default defineComponent({
       goBackFolder,
       checkFileFolder,
       cancelFileFolder,
+      inputGpt,
+      checkFileType,
+      getRootProps,
+      getInputProps,
+      ...dropRest,
     };
   },
 });
