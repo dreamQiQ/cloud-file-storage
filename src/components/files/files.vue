@@ -162,6 +162,23 @@
           </template>
           <template v-slot:handle="{ row: data }">
             <div class="d-flex justify-content-end">
+              <!-- AI会话 -->
+              <!-- <div
+                class="ms-2"
+                v-if="checkFileType(data, ['pdf', 'doc', 'docx'], false)"
+              >
+                <button
+                  class="btn btn-sm btn-icon btn-light btn-active-light-primary"
+                  @click="showAiModal(data)"
+                >
+                  <i class="ki-duotone ki-illustrator fs-5">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                  </i>
+                </button>
+              </div> -->
               <div class="ms-2">
                 <el-popover
                   v-if="data.type === 2"
@@ -225,14 +242,15 @@
               </div>
               <div class="ms-2">
                 <el-popover
+                  :visible="popoverVal === data.name"
                   placement="bottom-start"
                   :width="150"
-                  trigger="click"
                   popper-style="padding: 0px;"
                 >
                   <template #reference>
                     <el-button
                       class="btn btn-sm btn-icon btn-light btn-active-light-primary"
+                      @click.stop="checkPopover(data)"
                     >
                       <i class="ki-duotone ki-dots-square fs-5 m-0">
                         <span class="path1"></span>
@@ -245,6 +263,7 @@
                   <div
                     class="menu menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-150px py-4"
                     data-kt-menu="true"
+                    @click.stop="checkPopover(data)"
                   >
                     <div
                       v-if="data.type !== 1"
@@ -267,13 +286,13 @@
                     >
                       <a class="menu-link px-3">移至文件夹</a>
                     </div>
-                    <!-- <div
+                    <div
                       v-if="checkFileType(data, ['pdf', 'doc', 'docx'])"
                       class="menu-item px-3"
                       @click="inputGpt(data)"
                     >
                       <a class="menu-link px-3">输入GPT</a>
-                    </div> -->
+                    </div>
                     <div class="menu-item px-3" @click="fileDelete(data)">
                       <a class="menu-link text-danger px-3">删除</a>
                     </div>
@@ -429,6 +448,38 @@
       </div>
     </div>
   </div>
+  <!-- AI会话 -->
+  <div ref="AIDialogueRef" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modal title</h5>
+
+          <!--begin::Close-->
+          <div
+            class="btn btn-icon btn-sm btn-active-light-primary ms-2"
+            data-bs-dismiss="modal"
+          >
+            <i class="ki-duotone ki-cross fs-2x"
+              ><span class="path1"></span><span class="path2"></span
+            ></i>
+          </div>
+          <!--end::Close-->
+        </div>
+
+        <div class="modal-body" style="min-height: 80vh">
+          <p>Modal body text goes here.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -481,6 +532,9 @@ export default defineComponent({
         name: string;
         path: string;
       };
+      popoverVal: string;
+      AIDialogueRef: any;
+      AIDialogue: any;
     };
     const state: typeState = reactive({
       tableHeader: [],
@@ -510,6 +564,9 @@ export default defineComponent({
         name: "",
         path: "",
       },
+      popoverVal: "",
+      AIDialogueRef: "",
+      AIDialogue: "",
     });
 
     const fullPath = computed(() => {
@@ -522,6 +579,7 @@ export default defineComponent({
       // 弹框实例
       state.modalInstance = new Modal(state.moveFolderRef);
       state.uploadFile = new Modal(state.uploadFileRef);
+      state.AIDialogue = new Modal(state.AIDialogueRef);
 
       tableListInit();
       getTableList();
@@ -929,18 +987,57 @@ export default defineComponent({
     };
 
     // 输入GPT
-    const inputGpt = (data: any) => {
-      console.log(data);
+    const inputGpt = async (data: any) => {
+      try {
+        const params = {
+          parentDir: data.type === 1 ? data.path : fullPath.value,
+          fileName: data.name,
+        };
+        await ApiService.post("/ai/upload-for-ai", params);
+        toastr.success("操作成功");
+      } catch (error) {
+        toastr.error("操作失败");
+      }
     };
     // 判断文件类型
-    const checkFileType = (data: any, types: Array<string>) => {
+    const checkFileType = (
+      data: any,
+      types: Array<string>,
+      folder: boolean = true
+    ) => {
       const { name, type } = data;
-      if (type === 1) {
+      if (type === 1 && folder) {
         return true;
       } else {
         const typeIndex = name.lastIndexOf(".");
         const fileType = name.slice(typeIndex + 1);
         return types.includes(fileType);
+      }
+    };
+
+    // 切换弹框
+    const checkPopover = (data) => {
+      if (state.popoverVal === data.name) {
+        state.popoverVal = "";
+      } else {
+        state.popoverVal = data.name;
+      }
+      document.body.addEventListener("click", () => {
+        state.popoverVal = "";
+      });
+    };
+
+    // 显示ai会话
+    const showAiModal = async (data) => {
+      // state.AIDialogue.show();
+      try {
+        await inputGpt(data);
+        const res = await ApiService.get(
+          `/ai/parse-summary?parentDir=${fullPath.value}&fileName=${data.name}`
+        );
+        console.log("111111111", res);
+      } catch (error) {
+        toastr.error("操作失败");
       }
     };
 
@@ -972,6 +1069,8 @@ export default defineComponent({
       getRootProps,
       getInputProps,
       ...dropRest,
+      checkPopover,
+      showAiModal,
     };
   },
 });
